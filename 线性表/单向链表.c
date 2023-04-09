@@ -10,7 +10,8 @@ struct Node {
 struct Node* head = NULL;  // 定义头指针，初始化为NULL
 
 // 向链表中添加节点
-void add_node(int data) {
+void add_node(int data) 
+{
     // 为新节点分配空间
     struct Node* new_node = (struct Node*) malloc(sizeof(struct Node));
     new_node->data = data;  // 新节点的数据域为传入的data
@@ -35,7 +36,7 @@ void delete_node(int data) {
 
     if (head->data == data) {   // 如果要删除的节点是头节点，则将头指针指向下一个节点
         head = head->next;
-    } else {                    // 如果要删除的节点不是头节点，则遍历到要删除的节点，并将前一个节点的指针指向要删除节点的下一个节点
+    } else {// 如果要删除的节点不是头节点，则遍历到要删除的节点，并将前一个节点的指针指向要删除节点的下一个节点
         struct Node* current = head;        // 从头节点开始遍历
         while (current->next != NULL && current->next->data != data) {  // 找到要删除的节点
             current = current->next;
@@ -57,6 +58,7 @@ void print_list() {
 }
 
 int main() {
+    system("color 1A");
     add_node(1);
     add_node(2);
     add_node(3);
