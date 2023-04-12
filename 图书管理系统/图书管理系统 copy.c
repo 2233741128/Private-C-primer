@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <conio.h>
 #include <math.h>
-
-
+#define MAX_READER_NUM 20
+#define MAX_STR_LEN 1000
 //系统功能的实现
 struct Date           /*日期结构*/
 {
@@ -65,89 +65,103 @@ char Select_Menu()/*图书管理系统主菜单*/
 }
 
 /*图书上架功能的实现*/
-struct Book* InputNode()//输入图书信息
+struct Book* InputNode() //输入图书信息
 {
-	struct Book* p = NULL;
-	int i;
-	p = (struct Book*)malloc(sizeof(struct Book));//分配内存,作为数据域
-	if (p != NULL)
-	{
-		system("cls");//清屏
-		fflush(stdin);//清楚以前输入
-		printf("\n\t请输入书名：");
-		gets(p->m_strTitle);
-		printf("\n\t请输入作者：");
-		gets(p->m_strWroter);
-		printf("\n\t请输入当前在架册数：");
-		scanf("%d", &p->m_nMoreNum);
-		printf("\n\t请输入馆藏册数：");
-		scanf("%d", &p->m_nTotalHoldNum);
-		fflush(stdin);
-		printf("\n\t请输入本书简介：");
-		gets(p->m_strComment);
-	}
-	//以上为获得输入输出设备要求的信息
-	for (i = 0; i < 20; i++)
-		(p->reader[i]).num[0] = '\0';  //初始化书本结构成员的相关读者指针内容为空
-	return p;
+    struct Book* p = NULL;
+    p = (struct Book*)malloc(sizeof(struct Book)); //分配内存,作为数据域
+    if (p != NULL)
+    {
+        system("cls"); //清屏
+        printf("\n\t请输入书名：");
+        fgets(p->m_strTitle, MAX_STR_LEN, stdin);
+        printf("\n\t请输入作者：");
+        fgets(p->m_strWroter, MAX_STR_LEN, stdin);
+        printf("\n\t请输入当前在架册数：");
+        scanf("%d", &p->m_nMoreNum);
+        printf("\n\t请输入馆藏册数：");
+        scanf("%d", &p->m_nTotalHoldNum);
+        getchar(); //清除输入缓冲区中的换行符
+        printf("\n\t请输入本书简介：");
+        fgets(p->m_strComment, MAX_STR_LEN, stdin);
+    }
+    //以上为获得输入输出设备要求的信息
+    for (int i = 0; i < MAX_READER_NUM; i++)
+        p->reader[i].num[0] = '\0'; //初始化书本结构成员的相关读者指针内容为空
+    return p;
 }
 struct Info* Insert_BookInfo(struct Info* bth)
 {
-	int flag, j, k, t;
-	int x, y, z;
-	struct Info* p = NULL, * q = NULL, * u = NULL, * s = NULL;
-	struct Book* r = NULL, * l = NULL;
-	system("cls");//清屏
-	printf("\n\t请输入你想上架的书本号:");
-	scanf("%d", &x);
-	q=Search(bth,x,&k,&flag);//查找上架的书是否以及上架，返回已经找到的书的信息
-	if (flag == 1)
-	{ 
-		/*查找成功，存在此书*/
-		printf("\n\t当前存在这本书%d本，您想再增加一本《%s》书？（y/n）\n", q->m_pBookInfo->m_nTotalHoldNum, q->m_pBookInfo->m_strTitle);
-		z = getchar();
-		if (z == 'y' || z == 'Y')
-		{
-			/*确认上架另一本书*/
-			printf("\n\t本馆一共有：%d本", q->m_pBookInfo->m_nTotalHoldNum);
-			printf("\n\t并且有：%d本在图书馆内未借出。", q->m_pBookInfo->m_nMoreNum);
-			q->m_pBookInfo->m_nTotalHoldNum++;
-			q->m_pBookInfo->m_nMoreNum++;
-			printf("\n\t上架后一共有%d本", q->m_pBookInfo->m_nTotalHoldNum);
-			printf("上架后当前有：%d本在图书馆中", q->m_pBookInfo->m_nMoreNum);
-
-		}
-		return(bth);
-	}
-	r = InputNode(bth);/*成功插入书本信息，指针r存放刚刚插入的书*/
-	if (bth == NULL)
-	{
-		/*指针bth为空时，表示当前链表为空，此时需要单独处理，即链表头内存分配*/
-		bth = p = (struct Info*)malloc(sizeof(struct Info));
-		r->m_iBook_Number = x;/*将书号存入书本信息结构体*/
-		p->m_pParentPoint = NULL;
-		p->m_pSun = NULL;
-		p->m_pBookInfo = r;
-		return(p);//p是头指针
-	}
-	else
-	{
-		/*说明此时已经有头指针，则在此开始处理新插入的结构体指针*/
-		p = NULL;
-		p = bth;//p是临时指针
-		while (p->m_pSun != NULL)
-		{
-			p = p->m_pSun;//当后继结点不为空时，表示还未到链表尾部，用循环将指针移动到链表尾部
-		}
-		/*循环结束后，p指向的就是最后一个结点*/
-		q = (struct Info*)malloc(sizeof(struct Info));//q是新建结点来存放新加入的书
-		r->m_iBook_Number = x;//将书号存入书本信息结构体
-		p->m_pSun = q;//双向链表的前驱与后继结点连接
-		q->m_pParentPoint = p;//前驱节点为p
-		q->m_pSun = NULL;//后继结点为空
-		q->m_pBookInfo = r;
+    int flag, j, k, t;
+    int x, y, z;
+    struct Info* p = NULL, * q = NULL, * u = NULL, * s = NULL;
+    struct Book* r = NULL, * l = NULL;
+    system("cls");//清屏
+    printf("\n\t请输入你想上架的书本号:");
+    scanf("%d", &x);
+    q = Search(bth, x, &k, &flag);//查找上架的书是否已经上架，返回已经找到的书的信息
+    if (flag == 1)
+    {
+        /*查找成功，存在此书*/
+        printf("\n\t当前存在这本书%d本，您想再增加一本《%s》书？（y/n）\n", q->m_pBookInfo->m_nTotalHoldNum, q->m_pBookInfo->m_strTitle);
+        z = getchar();
+        if (z == 'y' || z == 'Y')
+        {
+            /*确认上架另一本书*/
+            printf("\n\t本馆一共有：%d本", q->m_pBookInfo->m_nTotalHoldNum);
+            printf("\n\t并且有：%d本在图书馆内未借出。", q->m_pBookInfo->m_nMoreNum);
+            q->m_pBookInfo->m_nTotalHoldNum++;
+            q->m_pBookInfo->m_nMoreNum++;
+            printf("\n\t上架后一共有%d本", q->m_pBookInfo->m_nTotalHoldNum);
+            printf("\n\t上架后当前有：%d本在图书馆中", q->m_pBookInfo->m_nMoreNum);
+        }
+        return(bth);
+    }
+    r = InputNode(bth);/*成功插入书本信息，指针r存放刚刚插入的书*/
+    if (bth == NULL)
+    {
+        /*指针bth为空时，表示当前链表为空，此时需要单独处理，即链表头内存分配*/
+        bth = p = (struct Info*)malloc(sizeof(struct Info));
+        r->m_iBook_Number = x;/*将书号存入书本信息结构体*/
+        p->m_pParentPoint = NULL;
+        p->m_pSun = NULL;
+        p->m_pBookInfo = r;
+        return(p);//p是头指针
+    }
+    else
+    {
+        /*说明此时已经有头指针，则在此开始处理新插入的结构体指针*/
+        p = NULL;
+        p = bth;//p是临时指针
+        while (p->m_pSun != NULL)
+        {
+            p = p->m_pSun;//当后继结点不为空时，表示还未到链表尾部，用循环将指针移动到链表尾部
+        }
+        /*循环结束后，p指向的就是最后一个结点*/
+        q = (struct Info*)malloc(sizeof(struct Info));//q是新建结点来存放新加入的书
+        r->m_iBook_Number = x;//将书号存入书本信息结构体
 	}
 	return(bth);
+}
+
+void UpdateBook(struct Info* bth) {
+    int bookID;
+    struct Info* temp = bth;
+    printf("Enter the Book ID to be updated: ");
+    scanf("%d", &bookID);
+    while (temp != NULL) {
+        if (temp->m_pBookInfo->m_iBook_Number == bookID) {
+            printf("\nEnter new Book ID: ");
+            scanf("%d", &temp->m_pBookInfo->m_iBook_Number);
+            printf("\nEnter new Book Title: ");
+            scanf(" %[^\n]s", temp->m_pBookInfo->m_strTitle);
+            printf("\nEnter new Author Name: ");
+            scanf(" %[^\n]s", temp->m_pBookInfo->m_strWroter);
+            printf("\nBook details updated successfully!");
+            return;
+        }
+        temp = temp->m_pSun;
+    }
+    printf("\nBook not found.");
 }
 
 /*图书下架功能的实现*/
@@ -240,62 +254,53 @@ struct Info* Delete_BookInfo(struct Info* bth)
 //查找图书
 struct Info* Search(struct Info* bth, int x, int* k, int* flag)
 {
-	struct Info* p = NULL;//当前工作指针
-	p = bth;
+	struct Info* p = bth;
 	*flag = 0;
-	while (p)
+	while (p != NULL)
 	{
 		if (p->m_pBookInfo->m_iBook_Number == x)
 		{
-			//找到相同的书号
 			*flag = 1;
 			return p;
-		}
-		else
-		{
-			*flag = 0;
 		}
 		if (p->m_pSun != NULL)
 		{
 			p = p->m_pSun;
-
 		}
 		else
 		{
 			break;
 		}
 	}
-	return bth;
+	return NULL;
 }
+
 void Output_BookInfo(struct Info* bth) 
 {
     int bookNumber, flag = 0;
 	system("cls");
     printf("请输入书本编号：");
     scanf("%d", &bookNumber);
-    while (bth != NULL) 
+	
+	struct Info* book = Search(bth, bookNumber, NULL, &flag);
+	
+    if (flag) 
 	{
-        if (bth->m_pBookInfo->m_iBook_Number == bookNumber) 
-		{
-            printf("书本编号：%d\n", bth->m_pBookInfo->m_iBook_Number);
-            printf("书名：%s\n", bth->m_pBookInfo->m_strTitle);
-            printf("作者：%s\n", bth->m_pBookInfo->m_strWroter);
-            printf("当前在架册数：%d\n", bth->m_pBookInfo->m_nMoreNum);
-            printf("馆藏册数：%d\n", bth->m_pBookInfo->m_nTotalHoldNum);
-            printf("图书简介：%s\n", bth->m_pBookInfo->m_strComment);
-            flag = 1;
-			
-            break;
-        }
-        bth = bth->m_pSun;
+        printf("书本编号：%d\n", book->m_pBookInfo->m_iBook_Number);
+        printf("书名：%s\n", book->m_pBookInfo->m_strTitle);
+        printf("作者：%s\n", book->m_pBookInfo->m_strWroter);
+        printf("当前在架册数：%d\n", book->m_pBookInfo->m_nMoreNum);
+        printf("馆藏册数：%d\n", book->m_pBookInfo->m_nTotalHoldNum);
+        printf("图书简介：%s\n", book->m_pBookInfo->m_strComment);
+        flag = 1;
     }
 
     if (!flag) 
 	{
         printf("未找到编号为%d的书本信息！\n", bookNumber);
     }
-	return flag;
 }
+
 //首先要输入要查找的书本编号，然后通过遍历双向链表来查找是否有该编号的书本信息，如果找到就打印出来，否则输出未找到的提示信息。
 
 

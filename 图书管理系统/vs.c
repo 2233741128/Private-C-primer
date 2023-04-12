@@ -75,16 +75,16 @@ struct Book* InputNode()//输入图书信息
 		system("cls");//清屏
 		fflush(stdin);//清楚以前输入
 		printf("\n\t请输入书名：");
-		gets(p->m_strTitle);
+		fgets(p->m_strTitle,100,stdin);
 		printf("\n\t请输入作者：");
-		gets(p->m_strWroter);
+		fgets(p->m_strWroter,100,stdin);
 		printf("\n\t请输入当前在架册数：");
 		scanf("%d", &p->m_nMoreNum);
 		printf("\n\t请输入馆藏册数：");
 		scanf("%d", &p->m_nTotalHoldNum);
 		fflush(stdin);
 		printf("\n\t请输入本书简介：");
-		gets(p->m_strComment);
+		fgets(p->m_strComment,1000,stdin);
 	}
 	//以上为获得输入输出设备要求的信息
 	for (i = 0; i < 20; i++)
@@ -240,32 +240,51 @@ struct Info* Delete_BookInfo(struct Info* bth)
 //查找图书功能的实现
 struct Info* Search(struct Info* bth, int x, int* k, int* flag)
 {
-	struct Info* p = NULL;//当前工作指针
-	p = bth;
+	struct Info* p = bth;
 	*flag = 0;
-	while (p)
+	while (p != NULL)
 	{
 		if (p->m_pBookInfo->m_iBook_Number == x)
 		{
-			//找到相同的书号
 			*flag = 1;
 			return p;
-		}
-		else
-		{
-			*flag = 0;
 		}
 		if (p->m_pSun != NULL)
 		{
 			p = p->m_pSun;
-
 		}
 		else
 		{
 			break;
 		}
 	}
-	return bth;
+	return NULL;
+}
+
+void Output_BookInfo(struct Info* bth) 
+{
+    int bookNumber, flag = 0;
+	system("cls");
+    printf("请输入书本编号：");
+    scanf("%d", &bookNumber);
+	
+	struct Info* book = Search(bth, bookNumber, NULL, &flag);
+	
+    if (flag) 
+	{
+        printf("书本编号：%d\n", book->m_pBookInfo->m_iBook_Number);
+        printf("书名：%s\n", book->m_pBookInfo->m_strTitle);
+        printf("作者：%s\n", book->m_pBookInfo->m_strWroter);
+        printf("当前在架册数：%d\n", book->m_pBookInfo->m_nMoreNum);
+        printf("馆藏册数：%d\n", book->m_pBookInfo->m_nTotalHoldNum);
+        printf("图书简介：%s\n", book->m_pBookInfo->m_strComment);
+        flag = 1;
+    }
+
+    if (!flag) 
+	{
+        printf("未找到编号为%d的书本信息！\n", bookNumber);
+    }
 }
 
 
@@ -422,6 +441,7 @@ void main()
 				bth = Delete_BookInfo(bth);
 				break;
 			case '3':
+				Output_BookInfo(bth);
 				break;
 				
 			case '4':
