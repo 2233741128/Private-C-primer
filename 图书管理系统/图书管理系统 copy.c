@@ -15,7 +15,7 @@ struct Reader         /*读者结构*/
 {
 	char num[20];     /*借书证号*/
 	struct Date bro;  /*借出时间*/
-	struct Date back; /*归还时间*/
+	struct Date back; /*归还时间*/ 
 };
 struct Book		/*书本结构*/
 {

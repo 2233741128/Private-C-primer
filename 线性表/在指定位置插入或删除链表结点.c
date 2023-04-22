@@ -25,11 +25,11 @@ void addnode(int score,int i)//插入元素score到第i个位置
 			temp=temp->next;
 			j++;
 		}
-		newnode->next=temp->next;
-		temp->next=newnode;
+		newnode->next=temp->next;//右侧是下一个结点地址，左侧是节点的指针域
+		temp->next=newnode;//将新节点的地址赋给指针域
 	}
 }
-void del(int i)//删除指定的数据
+void del(int i)//删除指定位置的数据
 {
 	if(head==NULL)//如果链表为空，直接结束返回
 	{
@@ -54,6 +54,29 @@ void del(int i)//删除指定的数据
 		}
 	}
 }
+void delete_date(int data) //删除指定的数据
+{
+    if (head == NULL) 
+    {   
+        return;
+    }
+
+    if (head->score == data) {   // 如果要删除的节点是头节点，则将头指针指向下一个节点
+        head = head->next;
+    } else 
+	{
+
+        struct stu* current = head;        
+        while (current->next != NULL && current->next->score != data) 
+		{  
+            current = current->next;
+        }
+        if (current->next != NULL) {        
+            current->next = current->next->next;
+        }
+    }
+}
+
 void printnode()//打印链表
 {
 	struct stu *current=head;
@@ -73,8 +96,10 @@ int main()
 	addnode(70,5);
 	printnode();
 	printf("\n");
+
 	
 	del(3);
+	delete_date(60);
 	printnode();
 
 }
