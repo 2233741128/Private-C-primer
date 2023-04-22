@@ -61,7 +61,7 @@ char Select_Menu()/*图书管理系统主菜单*/
 	printf("*                                  *\n");
 	printf("*       请选择菜单项：（1-6）        *\n");
 	printf("\\********************************//\n");
-	return getchar(); //用getchar(); 会等待你按下任意键，再继续执行下面的语句,头文件是conio.h
+	return getchar(); 
 }
 
 /*图书上架功能的实现*/
